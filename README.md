@@ -59,17 +59,29 @@ Grin transactions involve three cool tricks:
 2) Pedersen Commitments: As explained above, Grin transactions hide the amount in an output by multiplying them with a generator point. However, this would allow people to find `v1`, `v2` or `v3` by guessing them. To solve this problem, a second trick is applied by adding a private-key multiplied with another generator point `G` to the output commitment. This effectively makes it impossible to ques the value in an output:<br/><br/>  
 `Output = K1*G+v*H`.<br/><br/> 
 
-3) Kernel excess
- Hold on, if we add keys `K1*G` and `K2*G` to the output commitments, they will not add up to zero right? Indeed, by adding these we create an `excess`. By proving we know this excess (with is just another point on the curve), we prove we know `K1` and `K2`.
+3) Schnor signatures to create a joint Signature
+ Hold on, if we add keys `K1*G` and `K2*G` to the output commitments, they will not add up to zero right? The excess value of a transaction is the sum of all outputs blinding factors, minus the sum of all private-keys used to blind the inputs and outputs of a transaction.
+ 
+ Indeed, by adding all private-keys times generator point G, we create an `excess`. By proving we know this excess (with is just another point on the curve), we prove we know `K1` and `K2`.
  To an outsider the output commitment looks like a random piece of data : `09551fd2ba097bbf53d027c9820c2f19a544a15f21cb46614ce5860077a3663181`.<br/><br/>  
- Now lets say you do this kind of commitment for two outputs:<br/><br/>
+ Now lets say make a transaction with one input and change output created by you and one output signed for by the receiver of the transaction?:<br/><br/>
 `C1 = K1*G + v1*H`  
-`C2 = K2*G + v2*H`<br/><br/>
-How can you prove to an outsider you actually know the private keys `K1` and `K2`? Remember that addition using EC generator points still works, meaning that we can combine these two commitments `C1` and `C2` in a new commitment `Z` by adding them.
+`C2 = K2*G + v2*H`
+`C3 = K3*G + v2*G` <br/><br/>
+How can you prove to an outsider you actually know the private keys `K1` and `K2` and that the receiving party knows `K3`? Remember that addition using EC generator points still works, meaning that we can combine these two three commitments `C1`, `C2` and `C3` in a new commitment `Z` by adding them. Also remember that all value add up to zero even when multiplied by `H`! 
+
 The point `Z` (remember a commitment is simply a point on the curve) is the result of addition between points C1 and C2.<br/><br/>
-`Z = C1 + C2`  
-`Z = K1*G + K2*G + v1*H + v2*H`<br/><br/>
+`Z = C1 + C2 + C3`  
+`Y - Xi = (K2+K3-K1)*G +(v2+v3-v1)*H = excess*G + 0*H`  
+Where `Y - Xi` is a valid public key for generator point G; which is the case only if `Y - Xi = r*G + 0*H`. In other words, if the values don't sum to 0, the result is recognized as an invalid public key for G. This ensures that:
+
+ *  The transacting parties can collectively produce the excess value (it is the private key of their **joint signature**).
+ * **The sum of the outputs minus the inputs is 0**, because only a valid public key for G will check out against the signature.
+<br/><br/>
+
 This is the foundation for the Elliptic-curve algebra used in Mimblewimble to **prove both ownership of outputs (coins) and non-inflation****.
+
+The excess value of a transaction is the sum of all outputs blinding factors, minus the sum of all inputs blinding factors, ro - ri.
 
 
 > **TAKE AWAY:**    
@@ -78,7 +90,7 @@ Grin ***output commitment*** are both ***binding*** and ***hiding***. Any node c
 
 
 # How does transaction broadcasted end up on chain?
-Grin transactions data can be aggregated in many ways, by users through CoinJoin, [Dandelion](https://docs.grin.mw/wiki/miscellaneous/dandelion/https://docs.grin.mw/wiki/miscellaneous/dandelion/), by miners as well as on the chain as a whole. Transaction can be aggregated in Dandelion or in blocks simply by replacing the individual transaction kernels excesses by a single *excess* for the entire block. This means that only unless an observer stores all mempool data before aggregating, he or she does not know which inputs or outputs are  involved in the same transaction. In the case of CoinJoin or Dandelion, only the nodes that aggregated a transaction knows the likability between inputs and output before aggregating.
+Grin transactions data can be aggregated in many ways, by users through PayJoin, [Dandelion](https://docs.grin.mw/wiki/miscellaneous/dandelion/https://docs.grin.mw/wiki/miscellaneous/dandelion/), by miners as well as on the chain as a whole. Transaction can be aggregated in Dandelion or in blocks simply by replacing the individual transaction kernels excesses by a single *excess* for the entire block. This means that only unless an observer stores all mempool data before aggregating, he or she does not know which inputs or outputs are  involved in the same transaction. In the case of PayJoin or Dandelion, only the nodes that aggregated a transaction knows the likability between inputs and output before aggregating.
 
 >**Take away**:  
 First, grin transaction data consists of ***inputs***,  ***outputs*** and a ***transaction kernel*** and a ***range-proof**. 
@@ -89,9 +101,13 @@ Third, spend outputs can be freely forgotten thanks through *cut-through* in any
 # How does my wallet knows which outputs belong to it?  
 Output commitments themselves cannot be decomposed by your wallet. Output commitments are binding and hiding and only proof ownership and non-inflation. The real information about outputs is retrieved from **range-proofs**. Range-proofs are XOR'ed with a *nonce* and *index* to indicate which wallet key were used. Since your wallet can scan for range-proof that are  XORed with your wallet keys, it scan for outputs and decode the *amount* and *key index* for from the range-proof. The wallet now knows the *amount* and *key index* so it can use the outputs since it can now proof the kernel excess for any new transaction that involves these outputs since it knows the value and which key to use to calculate the kernel excess.  [[REF](https://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimblehttps://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimble)]
 
+
+
+
 ***
 # References
 https://github.com/mimblewimble/docs
+https://docs.grin.mw/wiki/introduction/mimblewimble/mimblewimble/
 https://docs.grin.mw/wiki/table-of-contents/
 https://phyro.github.io/what-is-grin/interactive_txs.html
 https://phyro.github.io/what-is-grin/mimblewimble.html
