@@ -1,20 +1,20 @@
-[WARNING THIS IS WORK IN PROGRESS AND THEREFORE CONTAINS INCOMPLETE AND INCORRECT INFORMATION]  
-# grin-for-muggles
-This documentation aims to clarify how Grin and mimblewimble work from a user viewpoint.
-The outline of the document follows a 'user story' to explain the 'magic of mimblewimble and grpragmaticalaly  so muggles, programmers and aspiring wizards can better understand Grin and mimblewimble. This document serves as an add on that you might want to read after looking at  the [official documentation](https://docs.grin.mw/wiki/table-of-contents/https://docs.grin.mw/wiki/table-of-contents/). Where possible I simplify while at the same time being **very explicit about the information flow between [users] - [nodes] - [wallets]**. 
-This documentation is self serving, and represents my own struggles as a muggle, visual thinker, programmer and aspiring wizard, to understand Grin. Since I have a background in Bitcoin, I will make many comparisons with Bitcoin. I will highlight where Grin is similar and where Grin is different from Bitcoin. Therefore, if you have a background in Bitcoin, this explanation might be useful for you.
+[WARNING THIS IS WORK IN PROGRESS AND MIGHT CONTAIN WRONG INFORMATION]  
+# Grin from a User perspective
+This documentation aims to explain Grin and mimblewimble from a user viewpoint.
+The outline of the document follows a 'User Story' approach to explain the "magic" of mimblewimble. This document serves as an Add-on that you might want to read after looking at  the [official documentation](https://docs.grin.mw/wiki/table-of-contents/https://docs.grin.mw/wiki/table-of-contents/). If you prefer an even more conceptual description, I highly recommend this explanation. Where possible I simplify while at the same time being **explicit about the information flow between [users] - [nodes] - [wallets]**. 
+This documentation is self serving, and represents my own struggles as a muggle, visual thinker, programmer and aspiring wizard, to understand Grin. Since I have a background in Bitcoin, I will make many comparisons with Bitcoin to highlight where Grin is different from Bitcoin. 
 
-**Questions to answer:**
+**Outline of this document:**
 
  1) How does my Grin wallet work?
  2) how does my wallet create a transaction?
- 3) How is my transaction broadcasted, aggregated and put on chain?
+ 3) How does transaction broadcasted end up on chain?
  4) How does my wallet knows which outputs belong to it? 
  
-If this explanation does not work well for you, scroll down to references. Reading about Grin and mimblewimble from multiple users and angles helped me on my journey to understand Grin. 
-
+If this explanation does not work well for you, scroll down to references. Reading about Grinfrom multiple angles helped me greatly on my journey to understand Grin. 
+***
 # How does my Grin wallet work?
-Grin wallets are generated the same way as most Crypto wallets. Grin follows the BIP32 standard in deriving a master seed from a mnemonic seed phrase (BIP39) and deriving children keys as a [Hierarchically Deterministic (HD)](https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/) wallet. The process for deriving BIP32 HD wallets is that you start with a randomly generated number (**seed**), which is presented to the users as a list of words called the **mnemonic seed phrase** (12-24 words). From this seed phrase a master key as well as children keys are generated. This can be best visualized as a tree. See below:
+Grin wallets are generated the same way as most Crypto wallets. Grin follows the BIP32 standard in deriving a master seed from a mnemonic seed phrase (BIP39) and deriving children keys as a [Hierarchically Deterministic (HD)](https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation-paths/) wallet. The process for deriving BIP32 HD wallets is that you start with a randomly generated number called a (**seed**), which is presented to the users as a list of words called the **mnemonic seed phrase** (12-24 words). From this seed phrase a master key as well as children keys are generated. HD wallets can be best understood by visualizing them as a tree:
 
     BIP32:
     Master  / Account/ Purpose / index
@@ -32,27 +32,21 @@ Grin wallets are generated the same way as most Crypto wallets. Grin follows the
  
 
   
-The most important thing to understand about the wallet is that all keys are Hierarchically Deterministic (HD). As long as you have the seed(phrase), you can derive the complete tree and all its branches.  
+The most important thing to understand about your Grin wallet is that all keys are Hierarchically Deterministic (HD). As long as you have the **seed(phrase)**, you can restore your wallet and derive the complete tree of derived keys.  
 
 
-**Does my Grin wallet differ in any my Bitcoin wallet?** Yes, there are some important practical differences to consider that do not have to do with how the wallet keys are generated, but with where transaction data is stored. Firstly, the Grin blockchain works very different from the Bitcoin blockchain. Grin nodes do nodes can freely "forget" transaction data from outputs that are no longer relevant, such as spend UTXO's. This is great for keeping the blockchain lightweight, but it also means your wallet cannot deduce from the blockchain spend transactions. However, if you restore your wallet from the seed-phrase, the wallet will not be able to restore the history of spend transaction outputs. Secondly, Grin is amazing for privacy since all outputs in a transaction, first 1) aggregated when being put in a block, and 2) get aggregated by your node. This is possible since all outputs can check no new coins are generated by testing that
+**Does my Grin wallet differ in any my Bitcoin wallet?**  
+Yes, there are two important differences to consider that have to do with how Grin transaction data is stored. Grin nodes can freely "forget" transaction data from outputs that are no longer relevant, such as spend UTXO's. This is great for keeping the blockchain lightweight by pruning unneeded data, but it also means your wallet cannot retrieve spend transactions data from the blockchain. Secondly, Grin is amazing for privacy since all outputs in a transaction get aggregated when 1) when using Dandelion, 2) when combining transaction data in a block, and 3) get aggregated by your node. This means that when restoring your wallet, even your own wallet cannot retrieve the likability between inputs and outputs in a block. 
 
-`Σ utxo = Σ kernel + height * 60 * H`
+Secondly, Grin does not store all transaction information on chain. Payment proofs are created interactively between you and the party you interact. Not storing Payment proofs on-chain keeps Grin lightweight and privacy preserving. The downside is that your wallet will not be able to restore payment proofs when recovering from the seed phrase. So as merchant who would use Grin, it would be wise to make the occasional backup of your *wallet_data* folder.
 
-holds true.
 
-Secondly, Grin does not store all information on chain. Payment proofs are created interactively between you and the party you interact. Not storing them on-chain keeps Grin lightweight and nimble. It does mean your wallet will not be able to restore payment proofs when recovering from the seed phrase. So as merchant who would use Grin, it would be wise to make the occasional backup of your *wallet_data* folder.
+> **WARNINGS:**  
+*1) Grin wallets store the master key without using hardened derivation. This means that the private-key can be converted back to the mnemonic seed phrase and should not be reused for other wallets.   
+2) As Merchant or Exchange, it would be wise to make the occasional backup of your **wallet_data** folder to have a backup of both spend transactions and a backup of payment proofs.*  
 
 
 ***
-**WARNING:**
-*Grin wallets store the master key without using hardened derivation. This means that the private-key can be converted back to the mnemonic seed phrase and should not be reused for other wallets.*  
-***
-***
-**PROGRAMMERS:**
-*In the Grin code, the wallet keys are referred to as a KeyChain object. The KeyChain object handles all key derivation. Keys are stored in the DB and can be passed around via the API. However, these keys musts be XOR to the stored wallet seed before being used.* 
-***
-
 # How are transactions in Grin different from Bitcoin?
 **Bitcoin transactions:**
 In Bitcoin, the sender is in full control and signs all transaction data by signing the transaction data with a [digital signature](https://learnmeabitcoin.com/beginners/guide/digital-signatures/https://learnmeabitcoin.com/beginners/guide/digital-signatures/). Bitcoin addresses are either hashed public keys (legacy address) or hash or a hash of a lock-script that includes your public key. Whenever someone send Bitcoin to your address, he transfers ownership of the Unspent Transaction Outputs (UTXO's) in that transaction by saying *"Anyone who can provide the lock-script with a valid signature for this address, can spend all outputs associated to it"*. Since only you can provide a signature for your public key/address, only you can spend your coins. All miners can verify that your signature matches the lock script, after which they will include your transaction in the next block to be mined. 
@@ -62,10 +56,12 @@ In mimblewimble/Grin transactions, both sender and receiver are in full control 
 
 Grin transactions involve three cool tricks:    
 1) Homomorphic Commitments: In Grin, values are hidden by multiplying all values with a Generator point. Although the result of multiplying a value with a generator point results in a seemingly random number. Addition and subtraction still work. This means that when add up numbers multiplied with a generator point on the Elliptic Curve, they still add up. E.g. if a transaction would involve two input and one output value `v1+v2=v3`, they can be multiplied with generator point `H` on an Elliptic Curve and anyone can verify that `v1*H + v2*H = v3*H` without knowing what `v1`, `v2` or `v3` is. 
-2) Pedersen Commitments: As explained above, Grin transactions hide the amount in an output by multiplying them with a generator point. However, this would allow people to find `v1`, `v2` or `v3` by guessing them. To solve this problem, a second trick is applied by adding a private-key multiplied with another generator point `G` to the output commitment. This effectively makes it impossible to ques the value in an output:  
-`Output = K1*G+v*H`.  
+2) Pedersen Commitments: As explained above, Grin transactions hide the amount in an output by multiplying them with a generator point. However, this would allow people to find `v1`, `v2` or `v3` by guessing them. To solve this problem, a second trick is applied by adding a private-key multiplied with another generator point `G` to the output commitment. This effectively makes it impossible to ques the value in an output:<br/><br/>  
+`Output = K1*G+v*H`.<br/><br/> 
+
+3) Kernel excess
  Hold on, if we add keys `K1*G` and `K2*G` to the output commitments, they will not add up to zero right? Indeed, by adding these we create an `excess`. By proving we know this excess (with is just another point on the curve), we prove we know `K1` and `K2`.
- To an outsider the output commitment looks like a random piece of data : `09551fd2ba097bbf53d027c9820c2f19a544a15f21cb46614ce5860077a3663181`.  
+ To an outsider the output commitment looks like a random piece of data : `09551fd2ba097bbf53d027c9820c2f19a544a15f21cb46614ce5860077a3663181`.<br/><br/>  
  Now lets say you do this kind of commitment for two outputs:<br/><br/>
 `C1 = K1*G + v1*H`  
 `C2 = K2*G + v2*H`<br/><br/>
@@ -76,25 +72,24 @@ The point `Z` (remember a commitment is simply a point on the curve) is the resu
 This is the foundation for the Elliptic-curve algebra used in Mimblewimble to **prove both ownership of outputs (coins) and non-inflation****.
 
 
-***
-**Take away message:** Grin output commitments are both *binding* and *hiding*. Any node can verify the outputs in a transaction, in a block or in the entire block-chain without knowing any of the output values. Therefore the Grin blockchain essentially aggregated into one big transaction that anyone can validate. Any node can verify `Σ utxo = Σ kernel + height * 60 * H` while forgetting outputs that were spend. This trick of "forgetting" spend outputs is called *cut-through* and can be applied when a) aggregating transaction through Dandelion, b) when aggregating transactions in a block and c) when aggregating blocks in the blockchain.
+> **TAKE AWAY:**    
+Grin ***output commitment*** are both ***binding*** and ***hiding***. Any node can verify the outputs in a transaction, in a block or in the entire block-chain without knowing any of the output values. Since all outputs are Homomorphic, outputs can be aggregated a) as CoinJoin, b) through Dandelion, c) in a block and d) when aggregating blocks in the blockchain into a single large transaction. A node treats the Grin blockchain as one large transaction and verifies `Σ utxo = Σ kernel + height * 60 * H` to prove no new coins are created apart from the block reward. This trick of "forgetting" spend outputs is called *[cut-through](https://docs.grin.mw/wiki/introduction/(og)introduction-to-mimblewimble/#cut-throughhttps://docs.grin.mw/wiki/introduction/(og)introduction-to-mimblewimble/#cut-through)*.
 *** 
 
 
+# How does transaction broadcasted end up on chain?
+Grin transactions data can be aggregated in many ways, by users through CoinJoin, [Dandelion](https://docs.grin.mw/wiki/miscellaneous/dandelion/https://docs.grin.mw/wiki/miscellaneous/dandelion/), by miners as well as on the chain as a whole. Transaction can be aggregated in Dandelion or in blocks simply by replacing the individual transaction kernels excesses by a single *excess* for the entire block. This means that only unless an observer stores all mempool data before aggregating, he or she does not know which inputs or outputs are  involved in the same transaction. In the case of CoinJoin or Dandelion, only the nodes that aggregated a transaction knows the likability between inputs and output before aggregating.
 
-# How is my transaction broadcasted, aggregated and put on chain?
-Grin transactions can either be directly broadcasted to nodes, or first be aggregated using [Dandelion](https://docs.grin.mw/wiki/miscellaneous/dandelion/https://docs.grin.mw/wiki/miscellaneous/dandelion/). In the case of Dandelion, random nodes keep on aggregating transactions data before one is selected to 'bloom' and broadcast aggregated transaction to the *mempool* for all miners to see. When skipping Dandelion like some wallets do, transaction data gets merged by miners in which case they know which inputs and outputs are linked. Just like in Dandelion, miners can aggregate transactions. Transaction can be aggregated simply by making one large transaction where the transaction kernel (also called excess) gets replace by a single *excess* for the entire block. This means that unless an observer stores all mempool data before aggregating, he or she does not know which inputs or outputs were involved in the same transactions
-
-***
-**Take away**:
-First, Grin transaction data consists of ***inputs***,  ***outputs*** and a ***transaction kernel***. Transaction data can be aggregated [coinJoin, Dandelion, block, entire chain] at which points they can no longer be linked. This effectively means the grin blockchain can be considered one entire big transaction.   
-Secondly, spend outputs can be freely forgotten thanks through *cut-through*. This **greatly improves privacy and Scalability** Add to this the fact that Grin outputs are blinded and you get an incredibly, lightweight, scaleble, and privacy preserving blockchain solution!
+>**Take away**:  
+First, grin transaction data consists of ***inputs***,  ***outputs*** and a ***transaction kernel*** and a ***range-proof**. 
+Second, transaction data can be aggregated [coinJoin, Dandelion, block, entire chain] at any point or time. This effectively means the grin blockchain can be considered one entire big transaction.   
+Third, spend outputs can be freely forgotten thanks through *cut-through* in any of the aggregation steps. This **greatly improves anonymity and Scalability.** Add to this the fact that Grin outputs are blinded and you get an incredibly, lightweight, scaleble, and privacy preserving blockchain!
 ***
 
 # How does my wallet knows which outputs belong to it?  
-It is important to realize that output commitments themselves cannot be decomposed by your wallet. Output commitments are binding and hiding. The real information about outputs is retrieved from **range-proofs**. Range-proofs are XOR'ed with a *nonce* and *index* to indicate which wallet key were used. Since your wallet can scan which key is XORed with the range-proof and with the index, it knows which key to use to use to decrypt the rangeproof to find its value. The wallet now use these outputs since it can now proof the kernel excess for any new transaction that involves these outputs since it knows the value and key to create the output commitment.  [[REF](https://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimblehttps://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimble)]
+Output commitments themselves cannot be decomposed by your wallet. Output commitments are binding and hiding and only proof ownership and non-inflation. The real information about outputs is retrieved from **range-proofs**. Range-proofs are XOR'ed with a *nonce* and *index* to indicate which wallet key were used. Since your wallet can scan for range-proof that are  XORed with your wallet keys, it scan for outputs and decode the *amount* and *key index* for from the range-proof. The wallet now knows the *amount* and *key index* so it can use the outputs since it can now proof the kernel excess for any new transaction that involves these outputs since it knows the value and which key to use to calculate the kernel excess.  [[REF](https://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimblehttps://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimble)]
 
-
+***
 # References
 https://github.com/mimblewimble/docs
 https://docs.grin.mw/wiki/table-of-contents/
