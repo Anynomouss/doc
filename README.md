@@ -125,13 +125,17 @@ Output commitments themselves cannot be decomposed by your wallet. Output commit
 * Mimblewimble is a new blockchain format
 * Grin has no addresses or amounts on chain
 * Grin nodes treat all transactions as **a single transaction**
+* transaction: sum(outputs) - sum(inputs) = kernel_excess  
+  block:       sum(outputs) - sum(inputs) = sum(kernel_excess)  
+  blockchain:  sum(outputs) - sum(inputs) = sum(kernel_excess) + height*60*H` 
 * Proving a) **non-inflation** b) **ownership** is as simple as checking: 
-  * `Σ utxo = Σ kernel + height * 60 * H` 
+  `Σ utxo = Σ kernel + height * 60 * H` 
 * A Grin transaction consist of a) a **single transaction kernel** b) a *range proof* per output and c) a **public fee**.
-* A spend Grin transaction only leaves the transaction kernel on chain. Range-proofs are 'forgotten', leaving only ~100 bytes on chain. 
-* Grin is about 13% the size of Bitcoin,`136216` versus `877341` lines of code!.
+* A spend Grin transaction only leaves the transaction kernel on chain. Range-proofs are 'forgotten', meaning historic transactions only have a size of ~100 bytes. 
+* Grins cod base is about 13% the size of Bitcoin,`136216` versus `877341` lines of code!.
 * Grin is simpler than Bitcoin
-![Grin historic transaction size]('historic_transaction_size_grin_monero_zcash.jpg')
+
+![Grin historic transaction size]('grin_historic_transaction_size.png')
 
 
 
