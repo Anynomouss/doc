@@ -135,7 +135,7 @@ Output commitments themselves cannot be decomposed by your wallet. Output commit
 * Grins cod base is about 13% the size of Bitcoin,`136216` versus `877341` lines of code!.
 * Grin is simpler than Bitcoin
 
-![Grin historic transaction size]('grin_historic_transaction_size.png')
+![Grin historic transaction size](grin_historic_transaction_size.png)
 
 
 
