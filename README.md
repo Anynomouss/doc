@@ -131,8 +131,8 @@ Output commitments themselves cannot be decomposed by your wallet. Output commit
 * A spend Grin transaction only leaves the transaction kernel on chain. Range-proofs are 'forgotten', leaving only ~100 bytes on chain. 
 * Grin is about 13% the size of Bitcoin,`136216` versus `877341` lines of code!.
 * Grin is simpler than Bitcoin
-
 ![Grin historic transaction size]('historic_transaction_size_grin_monero_zcash.jpeg')
+
 
 
 ***
