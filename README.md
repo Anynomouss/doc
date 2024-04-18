@@ -101,13 +101,6 @@ Grin transactions are interactive, each party signs for their own outputs and jo
 Range-proofs (bulletproofs) contain the information needed for your wallet to spend an output and to proof the value is non-negative. Therefore after you spend an output, all nodes will forget the output range-proof since it is no longer relevant. Nodes can even forget about spend outputs since they occur both as input and output they are not needed to validate the blockchain state is correct.
 *** 
 
-# How does a grin transaction look like?
-
-> **TAKE AWAY:**   
-First, grin transaction data consists of ***inputs***,  ***outputs*** and a ***transaction kernel*** and a ***range-proof**. 
-Second, transaction data can be aggregated [coinJoin, Dandelion, block, entire chain] at any point or time. This effectively means the grin blockchain can be considered one entire big transaction.   
-Third, spend outputs can be freely forgotten thanks through *cut-through* in any of the aggregation steps. This **greatly improves anonymity and Scalability.** Add to this the fact that Grin outputs are blinded and you get an incredibly, lightweight, scaleble, and privacy preserving blockchain!
-***
 
 # How does my transaction end up on chain?
 Grin transaction are broadcasted to the peers your node is connects to. Since the node does not use the Tor network, it means that your peers know that you send a transaction as well as your IP address. To protect you from this privacy leak, *grin-wallet* by default uses Dandelion to help protect your anonymity [REF] [https://docs.grin.mw/wiki/miscellaneous/dandelion/]. 
@@ -129,17 +122,19 @@ Output commitments themselves cannot be decomposed by your wallet. Output commit
 # Mind boggling realizations :exploding_head:
 * Mimblewimble is a new blockchain format
 * Grin has no addresses or amounts on chain
-* Grin nodes treat all transactions as **a single transaction**
+* Grin / mimblewimble gets **free privacy** and **free scalability** through its **interactive** nature :magic_wand:.
+* Interactivity is a **benefit**, not a cost :bulb:.
+* Grin nodes treat all transactions as **a single transaction**:exploding_head:
 * transaction: sum(outputs) - sum(inputs) = kernel_excess  
   block:       sum(outputs) - sum(inputs) = sum(kernel_excess)  
   blockchain:  sum(outputs) - sum(inputs) = sum(kernel_excess) + height*60*H` 
 * Proving a) **non-inflation** b) **ownership** is as simple as checking: 
   `Σ utxo = Σ kernel + height * 60 * H` 
 * A Grin transaction consist of a) a **single transaction kernel** b) a *range proof* per output and c) a **public fee**.
-* A spend Grin transaction only leaves the transaction kernel on chain. Range-proofs are 'forgotten'.
-Historic Grin transactions only have a size of ~100 bytes which is still smaller than a Bitcoin taproot transaction ~150 bytes while being way more anonymous. 
-* Grins code base is about 13% the size of Bitcoin,`136216` versus `877341` lines of code!.
-* Grin is simpler than Bitcoin
+* A spend Grin transaction only leaves the transaction kernel on chain. Range-proofs are 'forgotten'. This means that for a typical transaction of 1 input and two outputs that contain `~2 KB` of transaction data, only `~100 bytes` are left when you spend a transaction. 
+Historic Grin transactions  `~100` bytes which is still 2/3 the size of a Bitcoin taproot transaction `~150`. 
+* Grins code is minimal, around **~13% the size of Bitcoin**,`136216` versus `877341` lines of code.
+* Grin is minimal, elegant digital cash and to be honest, even ore interesting than Bitcoin for me. Check it out yourself :pill: :rabbit: :hole:
 
 ![Grin historic transaction size](grin_historic_transaction_size.png)
 
