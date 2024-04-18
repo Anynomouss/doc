@@ -125,9 +125,12 @@ Output commitments themselves cannot be decomposed by your wallet. Output commit
 * Grin / mimblewimble gets **free privacy** and **free scalability** through its **interactive** nature :magic_wand:.
 * Interactivity is a **benefit**, not a cost :bulb:.
 * Grin nodes treat all transactions as **a single transaction**:exploding_head:
-* transaction: sum(outputs) - sum(inputs) = kernel_excess  
-  block:       sum(outputs) - sum(inputs) = sum(kernel_excess)  
-  blockchain:  sum(outputs) - sum(inputs) = sum(kernel_excess) + height*60*H` 
+* Grin transactions can be aggregated at any level!
+    ```
+    transaction: sum(outputs) - sum(inputs) = kernel_excess  
+    block:       sum(outputs) - sum(inputs) = sum(kernel_excess)  
+    blockchain:  sum(outputs) - sum(inputs) = sum(kernel_excess) + height*60*H  
+    ```
 * Proving a) **non-inflation** b) **ownership** is as simple as checking: 
   `Σ utxo = Σ kernel + height * 60 * H` 
 * A Grin transaction consist of a) a **single transaction kernel** b) a *range proof* per output and c) a **public fee**.
